@@ -4,9 +4,9 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>Weight</th>
           <th>Team</th>
           <th>Conference</th>
+          <th>Weight Class</th>
           <th>Wins</th>
           <th>Losses</th>
         </tr>
