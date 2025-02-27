@@ -26,7 +26,7 @@ export const useGameStore = defineStore('game', {
   actions: {
     async fetchDailyWrestler() {
       try {
-        const response = await axios.get('http://localhost:3000/api/daily')
+        const response = await axios.get('https://gable-game-backend.onrender.com/api/daily')
         this.dailyWrestler = response.data
       } catch (err) {
         console.error('Error fetching daily wrestler:', err)
@@ -35,7 +35,7 @@ export const useGameStore = defineStore('game', {
 
     async fetchAllWrestlers() {
       try {
-        const response = await axios.get('http://localhost:3000/api/wrestlers')
+        const response = await axios.get('https://gable-game-backend.onrender.com/api/wrestlers')
         this.allWrestlers = response.data.map((wrestler) => wrestler.name)
       } catch (error) {
         console.error('Error fetching wrestlers:', error)
@@ -45,7 +45,7 @@ export const useGameStore = defineStore('game', {
     async submitGuess(name) {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/wrestlers?name=${encodeURIComponent(name)}`,
+          `https://gable-game-backend.onrender.com/api/wrestlers?name=${encodeURIComponent(name)}`,
         )
         const guessedWrestler = response.data
         console.log(guessedWrestler)
