@@ -13,7 +13,8 @@
       </thead>
       <tbody v-if="gameStore.previousGuesses.length">
         <tr v-for="guess in gameStore.previousGuesses" :key="guess.name">
-          <td class="name-box"><span class="name">{{ guess.name }}</span></td>
+          <td :stype="{ backgroundColor: guess.feedback.name }" class="name-box"><span class="name">{{ guess.name
+          }}</span></td>
           <td :style="{ backgroundColor: guess.feedback.team }">{{ guess.team }}</td>
           <td :style="{ backgroundColor: guess.feedback.conference }">{{ guess.conference }}</td>
           <td :style="{ backgroundColor: guess.feedback.weight_class.color }">
@@ -84,9 +85,5 @@ tbody tr {
 
 .name {
   font-weight: 800;
-}
-
-.name-box {
-  background-color: #abb5c4;
 }
 </style>

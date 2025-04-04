@@ -2,7 +2,11 @@
   <div class="flex flex-col items-center space-y-4">
     <input v-model="searchQuery" @input="filterWrestlers" @keydown.down="highlightNext" @keydown.up="highlightPrev"
       @keydown.enter.prevent="submitHighlightedGuess" @focus="showDropdown = true" @blur="hideDropdown"
-      placeholder="Type a wrestler's name..." class="input" autocomplete="off" />
+      placeholder="Type a wrestler's name..." class="input" autocomplete="off"
+      :disabled="gameStore.hasWon || gameStore.hasLost" />
+    <div class="guess-total">
+      {{ gameStore.previousGuesses.length }} of {{ gameStore.maxGuesses }} Guesses
+    </div>
     <ul v-if="showDropdown && filteredWrestlers.length" class="dropdown" ref="dropdownList">
       <li v-for="(name, index) in filteredWrestlers" :key="name" :class="{ highlighted: index === highlightedIndex }"
         @mousedown.prevent="submitGuess(name)" :ref="(el) => setDropdownItemRef(el, index)">
@@ -22,11 +26,6 @@ const highlightedIndex = ref(0)
 const showDropdown = ref(false)
 const dropdownList = ref(null)
 const dropdownItems = ref([])
-
-onMounted(() => {
-  gameStore.fetchDailyWrestler()
-  gameStore.fetchAllWrestlers()
-})
 
 const filteredWrestlers = computed(() =>
   searchQuery.value
