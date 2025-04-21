@@ -17,7 +17,7 @@
 
           <div class="solution" v-if="gameStore.hasWon || gameStore.hasLost">
             <p>
-              solution: {{ gameStore.dailyWrestler.name }}
+              Correct Wrestler: {{ gameStore.dailyWrestler.name }}
             </p>
           </div>
           <div class="results">
@@ -37,15 +37,22 @@
                 </tr>
               </tbody>
             </table>
-            <button>Share</button>
+            <!-- <button>Share</button> -->
           </div>
-
           <div class="stats-numbers">
-            <h3>Game Stats</h3>
-            <p>Total Games Played: {{ totalGames }}</p>
-            <p>Wins: {{ totalWins }}</p>
-            <p>Losses: {{ totalLosses }}</p>
-            <p>Win Rate: {{ winRate }}%</p>
+            <div class="guess-distribution">
+              <h3>Guess Distribution</h3>
+
+              <div v-for="n in 8" :key="n" class="guess-row">
+                <span class="guess-label">{{ n }}</span>
+
+                <div class="bar-container">
+                  <div class="bar-fill" :style="{ width: getBarWidth(n) + '%' }"></div>
+                </div>
+
+                <span class="guess-count">{{ winDistribution[n] }}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -55,7 +62,7 @@
 
 <script setup>
 import { useGameStore } from '@/store/gameStore'
-import { ref, watchEffect } from 'vue'
+import { ref, watchEffect, computed } from 'vue'
 
 let totalWins = 0
 let totalLosses = 0
@@ -69,18 +76,41 @@ const openModal = () => (isOpen.value = true)
 
 watchEffect(() => {
   if (isOpen.value) {
-    totalWins = parseInt(localStorage.getItem('total-wins'))
-    totalLosses = parseInt(localStorage.getItem('total-losses'))
+    totalWins = parseInt(localStorage.getItem('gable-total-wins'))
+    totalLosses = parseInt(localStorage.getItem('gable-total-losses'))
     totalGames = totalWins + totalLosses
     if (totalGames > 0) {
       winRate = (totalWins / totalGames) * 100
     } else {
       winRate = 0
     }
+    console.log(localStorage)
   }
 })
 
 defineExpose({ openModal })
+
+
+const getWinDistribution = computed(() => {
+  const raw = localStorage.getItem('gable-win-distribution');
+  const parsed = raw ? JSON.parse(raw) : {};
+  const defaultDist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
+
+  return { ...defaultDist, ...parsed };
+});
+
+const winDistribution = ref(getWinDistribution);
+
+function getBarWidth(n) {
+  const values = Object.values(winDistribution.value);
+  const max = Math.max(...values);
+
+  const count = winDistribution.value[n] || 0;
+
+  if (max === 0) return 0;
+  return Math.round((count / max) * 100);
+}
+
 </script>
 
 <style scoped>
@@ -157,5 +187,44 @@ button.close-btn {
   border: none;
   font-size: 18px;
   cursor: pointer;
+}
+
+
+.guess-distribution {
+  margin-top: 1rem;
+}
+
+.guess-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.guess-label {
+  width: 20px;
+  font-weight: bold;
+  text-align: right;
+  margin-right: 10px;
+}
+
+.bar-container {
+  flex-grow: 1;
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-right: 10px;
+}
+
+.bar-fill {
+  height: 100%;
+  background-color: #4caf50;
+  /* green */
+  transition: width 0.3s ease-in-out;
+}
+
+.guess-count {
+  width: 30px;
+  text-align: left;
 }
 </style>

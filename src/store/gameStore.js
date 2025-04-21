@@ -1,9 +1,13 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { useAuthStore } from '@/services/auth.store'
 
+const authStore = useAuthStore();
+const isAuthenticated = authStore.isAuthenticated
 const API_BASE_URL = import.meta.env.MODE === 'development'
   ? 'http://localhost:3000'
   : 'https://gable-game-backend.onrender.com'
+const today = new Date().toISOString().split('T')[0];
 
 export const useGameStore = defineStore('game', {
   state: () => ({
@@ -11,7 +15,9 @@ export const useGameStore = defineStore('game', {
     allWrestlers: [],
     previousGuesses: [],
     maxGuesses: 8,
-    gameState: localStorage.getItem('gable-state') ? localStorage.getItem('gable-state') : 'playing',
+    gameState: localStorage.getItem('gable-game-state') ? localStorage.getItem('gable-game-state') : 'playing',
+    years: { "FR": 1, "SO": 2, "JR": 3, "SR": 4 },
+    finishes: { "NQ": 1, "R16": 2, "R12": 3, "8th": 4, "7th": 5, "6th": 6, "5th": 7, "4th": 8, "3rd": 9, "2nd": 10, "1st": 11 },
     weightClasses: {
       125: 1,
       133: 2,
@@ -42,20 +48,20 @@ export const useGameStore = defineStore('game', {
     async fetchDailyWrestler() {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/daily`);
-        const storedDaily = localStorage.getItem('gable-game-daily');
-        if(!storedDaily) {
+        const storedDaily = localStorage.getItem('gable-daily-wrestler');
+        if (!storedDaily) {
           this.initializeLocal()
           this.dailyWrestler = response.data
-          localStorage.setItem('gable-game-daily', JSON.stringify(this.dailyWrestler))
+          localStorage.setItem('gable-daily-wrestler', JSON.stringify(this.dailyWrestler))
           this.gameState = 'playing'
-          localStorage.setItem('gable-state', 'playing');
-        } else if(response.data.name !== JSON.parse(storedDaily).name){
+          localStorage.setItem('gable-game-state', 'playing');
+        } else if (response.data.name !== JSON.parse(storedDaily).name) {
           this.dailyWrestler = response.data
           this.gameState = 'playing'
-          localStorage.setItem('gable-state', 'playing');
+          localStorage.setItem('gable-game-state', 'playing');
           this.previousGuesses = [];
           localStorage.removeItem('gable-game-guesses');
-          localStorage.setItem('gable-game-daily', JSON.stringify(this.dailyWrestler))
+          localStorage.setItem('gable-daily-wrestler', JSON.stringify(this.dailyWrestler))
         } else {
           this.dailyWrestler = JSON.parse(storedDaily)
         }
@@ -81,11 +87,19 @@ export const useGameStore = defineStore('game', {
     },
 
     async submitGuess(name) {
+      if (isAuthenticated) {
+
+      } else {
+
+      }
+
       try {
         const response = await axios.get(
           `${API_BASE_URL}/api/wrestlers?name=${encodeURIComponent(name)}`,
         )
         const guessedWrestler = response.data;
+
+
 
         this.previousGuesses.unshift({
           ...guessedWrestler,
@@ -94,13 +108,32 @@ export const useGameStore = defineStore('game', {
         localStorage.setItem('gable-game-guesses', JSON.stringify(this.previousGuesses));
 
         if (guessedWrestler.name == this.dailyWrestler.name) {
-          localStorage.setItem('gable-state', 'won')
-          this.calculateGuessStat()
-          localStorage.setItem('total-wins', parseInt(localStorage.getItem('total-wins')) + 1)
+          localStorage.setItem('gable-game-state', 'won')
+          this.updateWinDistribution()
+          localStorage.setItem('gable-total-wins', parseInt(localStorage.getItem('gable-total-wins')) + 1)
           this.gameState = 'won';
+
+          //streak logic
+          const lastWin = localStorage.getItem('gable-last-win-date')
+          const currentStreak = parseInt(localStorage.getItem('gable-current-streak'))
+          const maxStreak = parseInt(localStorage.getItem('gable-max-streak'))
+
+          const yesterday = new Date()
+          yesterday.setDate(yesterday.getDate() - 1)
+          const yesterdayStr = yesterday.toISOString().split('T')[0]
+
+          let newStreak = 1;
+
+          if (lastWin === yesterdayStr) newStreak = currentStreak + 1;
+
+          localStorage.setItem('gable-last-win-date', today)
+          localStorage.setItem('gable-current-streak', newStreak)
+
+          if (newStreak > maxStreak) localStorage.setItem('gable-max-streak', newStreak)
+
         } else if (this.previousGuesses.length >= this.maxGuesses) {
-          localStorage.setItem('gable-state', 'lost')
-          localStorage.setItem('total-losses', parseInt(localStorage.getItem('total-losses')) + 1)
+          localStorage.setItem('gable-game-state', 'lost')
+          localStorage.setItem('gable-total-losses', parseInt(localStorage.getItem('gable-total-losses')) + 1)
           this.gameState = 'lost';
         }
       } catch (error) {
@@ -111,18 +144,14 @@ export const useGameStore = defineStore('game', {
     getFeedback(guessedWrestler) {
       if (!this.dailyWrestler) return {}
 
-      console.log(guessedWrestler)
-
       return {
         name: this.compareValue(guessedWrestler.name, this.dailyWrestler.name),
-        weight_class: this.compareWeight(
-          guessedWrestler.weight_class,
-          this.dailyWrestler.weight_class,
-        ),
+        weight_class: this.compareWeight(guessedWrestler.weight_class, this.dailyWrestler.weight_class),
+        year: this.compareYear(guessedWrestler.year, this.dailyWrestler.year),
         team: this.compareValue(guessedWrestler.team, this.dailyWrestler.team),
         conference: this.compareValue(guessedWrestler.conference, this.dailyWrestler.conference),
-        wins: this.compareNumber(guessedWrestler.wins, this.dailyWrestler.wins),
-        losses: this.compareNumber(guessedWrestler.losses, this.dailyWrestler.losses),
+        win_percentage: this.comparePercentage(guessedWrestler.win_percentage, this.dailyWrestler.win_percentage),
+        ncaa_finish: this.compareFinish(guessedWrestler.ncaa_finish, this.dailyWrestler.ncaa_finish)
       }
     },
 
@@ -139,55 +168,43 @@ export const useGameStore = defineStore('game', {
       return { color: '#a6b0bf', icon: guessIndex > correctIndex ? 'down' : 'up' }
     },
 
-    compareNumber(guess, correct) {
+    compareFinish(guess, correct) {
+      const guessIndex = this.finishes[guess]
+      const correctIndex = this.finishes[correct]
+      if (guessIndex == correctIndex) return { color: '#1a690e', icon: '' }
+      if (Math.abs(guessIndex - correctIndex) == 1) return { color: '#aba00a', icon: guessIndex > correctIndex ? 'down' : 'up' }
+      return { color: '#a6b0bf', icon: guessIndex > correctIndex ? 'down' : 'up' }
+    },
+
+    comparePercentage(guess, correct) {
       if (guess === correct) return { color: '#1a690e', icon: '' }
-      if (Math.abs(guess - correct) <= 3)
-        return { color: '#aba00a', icon: guess > correct ? 'down' : 'up' }
+      if (Math.abs(guess - correct) <= 5) return { color: '#aba00a', icon: guess > correct ? 'down' : 'up' }
       return { color: '#a6b0bf', icon: guess > correct ? 'down' : 'up' }
     },
 
-    initializeLocal() {
-      console.log("local init")
-      localStorage.setItem('total-wins', 0)
-      localStorage.setItem('total-losses', 0)
-      localStorage.setItem('one-wins', 0)
-      localStorage.setItem('two-wins', 0)
-      localStorage.setItem('three-wins', 0)
-      localStorage.setItem('four-wins', 0)
-      localStorage.setItem('five-wins', 0)
-      localStorage.setItem('six-wins', 0)
-      localStorage.setItem('seven-wins', 0)
-      localStorage.setItem('eight-wins', 0)
-      console.log(localStorage)
+
+    compareYear(guess, correct) {
+      const guessIndex = this.years[guess]
+      const correctIndex = this.years[correct]
+      if (guessIndex == correctIndex) return { color: '#1a690e', icon: '' }
+      else return { color: '#a6b0bf', icon: guessIndex > correctIndex ? 'down' : 'up' }
     },
 
-    calculateGuessStat() {
-      switch(this.previousGuesses.length) {
-        case 1:
-          localStorage.setItem('one-wins', parseInt(localStorage.getItem('one-wins')) + 1)
-          break;
-        case 2:
-          localStorage.setItem('two-wins', parseInt(localStorage.getItem('two-wins')) + 1)
-          break;
-        case 3:
-          localStorage.setItem('three-wins', parseInt(localStorage.getItem('three-wins')) + 1)
-          break;
-        case 4:
-          localStorage.setItem('four-wins', parseInt(localStorage.getItem('four-wins')) + 1)
-          break;
-        case 5:
-          localStorage.setItem('five-wins', parseInt(localStorage.getItem('five-wins')) + 1)
-          break;
-        case 6:
-          localStorage.setItem('six-wins', parseInt(localStorage.getItem('six-wins')) + 1)
-          break;
-        case 7:
-          localStorage.setItem('seven-wins', parseInt(localStorage.getItem('seven-wins')) + 1)
-          break;
-        case 8:
-          localStorage.setItem('eight-wins', parseInt(localStorage.getItem('eight-wins')) + 1)
-          break;
-      }
+    initializeLocal() {
+      localStorage.setItem('gable-win-distribution', JSON.stringify({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, }))
+      localStorage.setItem('gable-total-wins', 0)
+      localStorage.setItem('gable-total-losses', 0)
+      localStorage.setItem('gable-current-streak', 0)
+      localStorage.setItem('gable-max-streak', 0)
+      localStorage.setItem('gable-last-win-date', '1970-01-01')
+    },
+
+    updateWinDistribution() {
+      const dist = JSON.parse(localStorage.getItem('gable-win-distribution'));
+
+      dist[this.previousGuesses.length]++;
+
+      localStorage.setItem('gable-win-distribution', JSON.stringify(dist));
     },
   },
 })
