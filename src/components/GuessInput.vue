@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center space-y-4">
+  <div>
     <input v-model="searchQuery" @input="filterWrestlers" @keydown.down="highlightNext" @keydown.up="highlightPrev"
       @keydown.enter.prevent="submitHighlightedGuess" @focus="showDropdown = true" @blur="hideDropdown"
       placeholder="Type a wrestler's name..." class="input" autocomplete="off"
@@ -90,13 +90,16 @@ const hideDropdown = () => {
 
 <style scoped>
 .input {
-  width: 400px;
-  padding: 8px;
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
   border: 1px solid #ccc;
+  font-size: 1rem;
 }
 
 .dropdown {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   list-style: none;
   padding: 0;
   border: 1px solid #ccc;
@@ -104,14 +107,50 @@ const hideDropdown = () => {
   overflow-y: auto;
   position: absolute;
   background: white;
+  z-index: 10;
 }
 
 .dropdown li {
-  padding: 8px;
+  padding: 12px;
   cursor: pointer;
+  font-size: 1rem;
 }
 
 .dropdown li.highlighted {
   background: lightgray;
+}
+
+@media (max-width: 768px) {
+  .input {
+    max-width: 90%;
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .dropdown {
+    max-width: 90%;
+  }
+
+  .dropdown li {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .input {
+    max-width: 100%;
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+
+  .dropdown {
+    max-width: 100%;
+  }
+
+  .dropdown li {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
 }
 </style>
