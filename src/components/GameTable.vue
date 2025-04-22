@@ -5,11 +5,20 @@
         <thead>
           <tr>
             <th>Name</th>
-            <th>Year</th>
+            <th class="year-col">
+              <span class="desktop-only">Year</span>
+              <span class="mobile-only">Yr</span>
+            </th>
             <th>Team</th>
-            <th>Conference</th>
+            <th>
+              <span class="desktop-only">Conference</span>
+              <span class="mobile-only">Conf.</span>
+            </th>
             <th>Weight Class</th>
-            <th>Win Percentage</th>
+            <th>
+              <span class="desktop-only">Win Percentage</span>
+              <span class="mobile-only">Win %</span>
+            </th>
             <th>NCAA Finish</th>
           </tr>
         </thead>
@@ -18,12 +27,14 @@
             <td :style="{ backgroundColor: guess.feedback.name }" class="name-box">
               <span class="name"> {{ guess.name }}</span>
             </td>
-            <td :style="{ backgroundColor: guess.feedback.year.color }">
-              {{ guess.year }}
-              <MoveUp v-if="guess.feedback.year.icon === 'up'" />
-              <MoveDown v-if="guess.feedback.year.icon === 'down'" />
+            <td :style="{ backgroundColor: guess.feedback.year.color }" class="year-cell">
+              <div class="data">
+                {{ guess.year }}
+                <MoveUp v-if="guess.feedback.year.icon === 'up'" />
+                <MoveDown v-if="guess.feedback.year.icon === 'down'" />
+              </div>
             </td>
-            <td :style="{ backgroundColor: guess.feedback.team }">{{ guess.team }}</td>
+            <td :style="{ backgroundColor: guess.feedback.team }" class="team-cell">{{ guess.team }}</td>
             <td :style="{ backgroundColor: guess.feedback.conference }">{{ guess.conference }}</td>
             <td :style="{ backgroundColor: guess.feedback.weight_class.color }">
               <div class="data">
@@ -60,63 +71,6 @@ const gameStore = useGameStore()
 </script>
 
 <style scoped>
-/* Default styles (for desktop and wider screens) */
-table {
-  width: 100%;
-  min-width: 600px;
-  font-size: 16px;
-}
-
-/* Smaller screen: shrink font and table min-width */
-@media (max-width: 768px) {
-  table {
-    min-width: 500px;
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  table {
-    min-width: 400px;
-    font-size: 12px;
-  }
-
-  th,
-  td {
-    padding: 6px;
-  }
-}
-
-thead tr {
-  height: 40px;
-}
-
-th,
-td {
-  padding: 8px;
-  text-align: center;
-  border-bottom: 1px solid black;
-}
-
-th {
-  background-color: #f4f4f4;
-  font-weight: 800;
-}
-
-tbody tr {
-  height: 80px;
-}
-
-.data {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.name {
-  font-weight: 800;
-}
-
 .guess-table-wrapper {
   width: 100%;
   margin-top: 1rem;
@@ -128,10 +82,10 @@ tbody tr {
 }
 
 table {
-  border-collapse: collapse;
   width: 100%;
-  min-width: 600px;
-  /* This forces scroll on small screens */
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 14px;
 }
 
 th,
@@ -139,9 +93,114 @@ td {
   padding: 8px;
   text-align: center;
   border: 1px solid #ddd;
+  word-wrap: break-word;
+  white-space: normal;
 }
 
-th {
-  background-color: #f4f4f4;
+.name-box {
+  font-weight: bold;
+}
+
+.name {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  font-size: 14px;
+}
+
+.data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: inline;
+}
+
+td.name-box,
+td.team-cell {
+  font-size: 14px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.year-cell {
+  width: 40px;
+  max-width: 40px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 13px;
+  white-space: nowrap;
+  padding: 4px;
+}
+
+/* Responsive: Shrink for mobile */
+@media (max-width: 768px) {
+  table {
+    font-size: 13px;
+  }
+
+  th,
+  td {
+    padding: 6px;
+  }
+
+  .name {
+    font-size: 10px;
+  }
+
+  .data {
+    gap: 2px;
+  }
+
+  td.name-box,
+  td.team-cell {
+    font-size: 12px;
+  }
+
+  .mobile-only {
+    display: inline;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .year-col {
+    width: 32px;
+    font-size: 12px;
+    padding: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    font-size: 12px;
+  }
+
+  th,
+  td {
+    padding: 2px;
+  }
+
+  .name {
+    font-size: 8px;
+  }
+
+  .data {
+    flex-direction: column;
+    font-size: 12px;
+  }
+
+  td.name,
+  td.team-cell {
+    font-size: 9px;
+  }
 }
 </style>
