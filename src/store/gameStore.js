@@ -177,9 +177,14 @@ export const useGameStore = defineStore('game', {
     },
 
     comparePercentage(guess, correct) {
-      if (guess === correct) return { color: '#1a690e', icon: '' }
-      if (Math.abs(guess - correct) <= 5) return { color: '#aba00a', icon: guess > correct ? 'down' : 'up' }
-      return { color: '#a6b0bf', icon: guess > correct ? 'down' : 'up' }
+      const guessNum = parseFloat(guess)
+      const correctNum = parseFloat(correct)
+      console.log("Guess", guessNum)
+      console.log("Correct", correctNum)
+      console.log(guessNum > correctNum)
+      if (guessNum === correctNum) return { color: '#1a690e', icon: '' }
+      if (Math.abs(guessNum - correctNum) <= 5) return { color: '#aba00a', icon: guessNum > correctNum ? 'down' : 'up' }
+      return { color: '#a6b0bf', icon: guessNum > correctNum ? 'down' : 'up' }
     },
 
 
