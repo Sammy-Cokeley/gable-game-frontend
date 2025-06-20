@@ -5,6 +5,7 @@ import router from '../router';
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: JSON.parse(localStorage.getItem('user')),
+    token: localStorage.getItem('auth-token') || null,
     loading: false,
     error: null
   }),
@@ -19,7 +20,16 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       try {
         const data = await authService.login(email, password);
-        this.user = { token: data.token };
+        this.token = data.user || null;
+        this.user = data.user;
+
+        localStorage.setItem('auth-token', data.token)
+
+        // const gameStore = useGameStore();
+        // await gameStore.fetchDailyWrestler();
+        // await gameStore.loadUserGuessesForToday();
+        // await gameStore.loadUserStats();
+
         router.push('/');
       } catch (error) {
         this.error = error.response?.data?.error || 'Login failed';
@@ -34,7 +44,8 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       try {
         await authService.register(email, password);
-        await this.login(email, password);
+        localStorage.setItem('pending-verification-email', email);
+        router.push('/verify-email');
       } catch (error) {
         this.error = error.response?.data?.error || 'Registration failed';
         throw error;
@@ -64,6 +75,16 @@ export const useAuthStore = defineStore('auth', {
       } finally {
         this.loading = false;
       }
+    },
+    initializeAuth() {
+      const token = localStorage.getItem('gable-token');
+      if (token) {
+        this.token = token;
+        this.isAuthenticated = true;
+
+        // Optionally: decode token and set user info here
+      }
     }
+
   }
 });

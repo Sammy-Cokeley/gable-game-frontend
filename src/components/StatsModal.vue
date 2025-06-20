@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div class="modal-overlay" v-if="isOpen" @click="closeModal">
-      <div class="modal-content">
+      <div class="modal-content" @click.stop>
         <button class="close-button" @click="closeModal">×</button>
         <div class="stats">
           <h2>Your Results</h2>
@@ -15,11 +15,15 @@
             <p>The correct wrestler was <strong>{{ gameStore.dailyWrestler.name }}</strong>.</p>
           </div>
 
-          <div class="solution" v-if="gameStore.hasWon || gameStore.hasLost">
+          <div class="solution" v-if="gameStore.hasLost">
             <p>
               Correct Wrestler: {{ gameStore.dailyWrestler.name }}
             </p>
           </div>
+          <a v-if="tweetText" :href="`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`"
+            target="_blank" rel="noopener noreferrer" class="share-btn">
+            Share on Twitter
+          </a>
           <div class="results">
             <table>
               <tbody>
@@ -27,13 +31,21 @@
                   <td>{{ totalGames }}</td>
                   <td>{{ totalWins }}</td>
                   <td>{{ totalLosses }}</td>
-                  <td>{{ winRate }}</td>
                 </tr>
                 <tr class="data-titles">
                   <td>Played</td>
                   <td>Wins</td>
                   <td>Losses</td>
+                </tr>
+                <tr class="table-header">
+                  <td>{{ roundedWinRate }}</td>
+                  <td>{{ gameStore.currentStreak }}</td>
+                  <td>{{ gameStore.maxStreak }}</td>
+                </tr>
+                <tr class="data-titles">
                   <td>Win %</td>
+                  <td>Current Streak</td>
+                  <td>Max Streak</td>
                 </tr>
               </tbody>
             </table>
@@ -50,7 +62,7 @@
                   <div class="bar-fill" :style="{ width: getBarWidth(n) + '%' }"></div>
                 </div>
 
-                <span class="guess-count">{{ winDistribution[n] }}</span>
+                <span class="guess-count">{{ winDistribution[n] | 0 }}</span>
               </div>
             </div>
           </div>
@@ -61,55 +73,95 @@
 </template>
 
 <script setup>
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore } from '@/store/game.store'
 import { ref, watchEffect, computed } from 'vue'
+import { useAuthStore } from '@/store/auth.store'
 
 let totalWins = 0
 let totalLosses = 0
 let totalGames = 0
 let winRate = 0
+let roundedWinRate = 0
 
 const gameStore = useGameStore()
 const isOpen = ref(false)
 const closeModal = () => (isOpen.value = false)
 const openModal = () => (isOpen.value = true)
+const tweetText = computed(() => generateTweetText());
 
 watchEffect(() => {
   if (isOpen.value) {
-    totalWins = parseInt(localStorage.getItem('gable-total-wins'))
-    totalLosses = parseInt(localStorage.getItem('gable-total-losses'))
+    totalWins = gameStore.totalWins
+    totalLosses = gameStore.totalLosses
     totalGames = totalWins + totalLosses
     if (totalGames > 0) {
       winRate = (totalWins / totalGames) * 100
+      roundedWinRate = winRate.toFixed(2)
     } else {
       winRate = 0
     }
-    console.log(localStorage)
   }
 })
 
 defineExpose({ openModal })
 
-
-const getWinDistribution = computed(() => {
-  const raw = localStorage.getItem('gable-win-distribution');
-  const parsed = raw ? JSON.parse(raw) : {};
-  const defaultDist = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
-
-  return { ...defaultDist, ...parsed };
-});
-
-const winDistribution = ref(getWinDistribution);
+const winDistribution = computed(() => gameStore.winDistribution);
 
 function getBarWidth(n) {
-  const values = Object.values(winDistribution.value);
+  const values = Object.values(winDistribution.value); // ✅ fix
   const max = Math.max(...values);
+
+  console.log(values)
+  console.log(max)
 
   const count = winDistribution.value[n] || 0;
 
   if (max === 0) return 0;
   return Math.round((count / max) * 100);
 }
+
+function colorToEmoji(color) {
+  switch (color) {
+    case '#1a690e': return '🟩'; // Green
+    case '#aba00a': return '🟨'; // Yellow
+    default: return '⬛';        // Gray
+  }
+}
+
+function generateEmojiGrid(guesses) {
+  return guesses.map(guess => {
+    const feedback = guess.feedback;
+    return [
+      colorToEmoji(feedback.year.color),
+      colorToEmoji(feedback.team),
+      colorToEmoji(feedback.conference),
+      colorToEmoji(feedback.weight_class.color),
+      colorToEmoji(feedback.win_percentage.color),
+      colorToEmoji(feedback.ncaa_finish.color)
+    ].join('');
+  }).join('\n');
+}
+
+const generateTweetText = () => {
+  const authStore = useAuthStore()
+  const { previousGuesses, gameState, currentStreak } = gameStore;
+  const today = new Date().toISOString().split('T')[0];
+
+  console.log(today)
+
+  if (!authStore.isAuthenticated || gameState !== 'won') return null;
+
+  const emojiGrid = generateEmojiGrid(previousGuesses);
+
+  return `#GableGame 
+I guessed today's wrestler in ${previousGuesses.length} ${previousGuesses.length === 1 ? 'try' : 'tries'}!
+Streak: ${currentStreak} 🔥
+
+https://gablegame.com
+
+
+${emojiGrid}`
+};
 
 </script>
 
@@ -124,14 +176,17 @@ function getBarWidth(n) {
 }
 
 .modal-content {
-  font-family: jetbrains mono;
   background: white;
-  padding: 20px;
+  padding: 10px;
   border-radius: 8px;
   width: 80%;
-  max-width: 400px;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow: hidden;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  font-family: JetBrains Mono;
+  overflow-y: auto;
 }
 
 .stats {
@@ -139,6 +194,13 @@ function getBarWidth(n) {
   border-radius: 3px;
   padding: 10px;
   box-shadow: 0px 2px 3px rgb(150, 150, 150);
+}
+
+.modal-content>.p-4 {
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 75vh;
+  box-sizing: border-box;
 }
 
 .results {
@@ -192,6 +254,7 @@ button.close-btn {
 
 .guess-distribution {
   margin-top: 1rem;
+  padding-bottom: 4px;
 }
 
 .guess-row {
@@ -226,5 +289,21 @@ button.close-btn {
 .guess-count {
   width: 30px;
   text-align: left;
+}
+
+.share-btn {
+  display: inline-block;
+  margin: 1rem;
+  padding: 0.5rem 1.25rem;
+  background-color: #1e95e0;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.share-btn:hover {
+  background-color: #0d8ddb;
 }
 </style>

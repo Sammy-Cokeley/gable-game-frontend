@@ -1,42 +1,45 @@
 <template>
   <div class="header">
-    <div class="header-icons-left">
-      <CircleHelp :stroke-width="2.5" :size="35" @click="openHelp" class="icons" />
-      <ChartNoAxesColumnIncreasing :stroke-width="2.5" :size="35" @click="openStats" class="icons" />
+    <!-- Utility bar -->
+    <div class="header-top">
+      <div class="header-icons">
+        <button class="chip-button" @click="helpModal?.openModal()">Help</button>
+        <button class="chip-button" @click="statsModal?.openModal()">Stats</button>
+        <template v-if="isAuthenticated">
+          <button @click="handleLogout" class="chip-button">Logout</button>
+        </template>
+        <template v-else>
+          <router-link to="/login" class="chip-button">Login</router-link>
+          <router-link to="/register" class="chip-button">Register</router-link>
+        </template>
+      </div>
     </div>
+
+    <!-- Title -->
     <div class="title">
-      <h1 class="gable">Gable</h1>
-      <h3 class="gable-subtitle">Wrestling Guessing Game</h3>
-    </div>
-    <div class="header-icons-right">
-      <!-- <template v-if="authStore.isAuthenticated">
-        <button @click="handleLogout" class="logout-button">Logout</button>
-      </template>
-<template v-else>
-        <router-link to="/login" class="auth-link">Login</router-link>
-        <router-link to="/register" class="auth-link">Register</router-link>
-      </template> -->
+      <h1 class="gable">Gable Game</h1>
     </div>
   </div>
+
   <HelpModal ref="helpModal" />
   <StatsModal ref="statsModal" />
 </template>
 
+
 <script setup>
-import { ref } from 'vue'
-import { CircleHelp, ChartNoAxesColumnIncreasing } from 'lucide-vue-next'
+import { computed, ref } from 'vue'
+// import { CircleHelp, ChartNoAxesColumnIncreasing } from 'lucide-vue-next'
 import HelpModal from '@/components/HelpModal.vue'
 import StatsModal from '@/components/StatsModal.vue'
-import { useAuthStore } from '@/services/auth.store'
+import { useAuthStore } from '@/store/auth.store'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore();
 const router = useRouter();
 const helpModal = ref(null)
 const statsModal = ref(null)
-const openHelp = () => helpModal.value.openModal()
-const openStats = () => statsModal.value.openModal()
 
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const handleLogout = () => {
   authStore.logout();
@@ -48,98 +51,79 @@ const handleLogout = () => {
 <style scoped>
 .header {
   width: 100%;
+  padding: 0.5rem 1rem;
+  box-sizing: border-box;
+}
+
+/* Utility top bar */
+.header-top {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 30px;
+  align-items: center;
+  flex-wrap: wrap;
+  /* allow stacking on mobile */
+  font-size: 0.9rem;
 }
 
-.header-icons-left {
-  margin: 5px 15px;
+.header-icons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.header-icons-right {
-  margin: 5px 50px;
+a {
+  text-decoration: none;
 }
 
-.icons:hover {
+.chip-button {
+  padding: 0.4rem 0.75rem;
+  background-color: #014180;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
   cursor: pointer;
+  transition: background 0.2s ease;
+  text-decoration: none;
 }
 
+.chip-button:hover {
+  background-color: #004f99;
+}
+
+/* Title centered */
 .title {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
 }
 
 .gable {
-  font-size: 80px;
+  font-size: 2.25rem;
   font-family: JetBrains Mono;
   font-weight: 800;
-  letter-spacing: 10px;
+  letter-spacing: 6px;
   color: #021573;
-  margin: 10px 0px;
+  margin: 0.5rem 0;
 }
 
-.gable-subtitle {
-  font-size: 40px;
-  font-family: JetBrains Mono;
-  font-weight: 600;
-  color: #021573;
-  margin: 4px 0px;
-}
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-@media (max-width: 1024px) {
+  .header-icons {
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
   .gable {
-    font-size: 2.5rem;
-    /* Smaller font for tablet */
+    font-size: 1.75rem;
+    text-align: center;
+    letter-spacing: 4px;
   }
-
-  .gable-subtitle {
-    font-size: 1.8rem;
-    /* Smaller font for tablet */
-  }
-}
-
-@media (max-width: 768px) {
-  .gable {
-    font-size: 2rem;
-    /* Smaller font for mobile */
-  }
-
-  .gable-subtitle {
-    font-size: 1.5rem;
-    /* Smaller font for mobile */
-  }
-}
-
-@media (max-width: 480px) {
-  .gable {
-    font-size: 1.5rem;
-    /* Even smaller for very small screens */
-  }
-
-  .gable-subtitle {
-    font-size: 1.2rem;
-    /* Even smaller for very small screens */
-  }
-}
-
-.logout-button {
-  background: none;
-  border: none;
-  color: #0066cc;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.auth-link {
-  color: #0066cc;
-  text-decoration: none;
-  margin-left: 1rem;
-}
-
-.auth-link:hover,
-.logout-button:hover {
-  text-decoration: underline;
 }
 </style>

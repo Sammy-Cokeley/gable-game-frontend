@@ -1,4 +1,5 @@
 <template>
+    <Header />
     <div class="verify-container">
         <div v-if="loading" class="verify-message">
             <h2>Verifying your email...</h2>
@@ -13,6 +14,14 @@
             </router-link>
         </div>
 
+        <div v-else-if="verificationPending" class="verify-message">
+            <h2>Verify Your Email</h2>
+            <p>
+                A verification link has been sent to <strong>{{ email }}</strong>.
+                Please check your inbox and click the link to complete registration.
+            </p>
+        </div>
+
         <div v-else class="verify-message error">
             <h2>Verification Failed</h2>
             <p>{{ errorMessage }}</p>
@@ -24,6 +33,7 @@
 </template>
 
 <script setup>
+import Header from '@/components/Header.vue';
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
@@ -33,6 +43,7 @@ const loading = ref(true);
 const verified = ref(false);
 const errorMessage = ref('');
 const email = ref('');
+const verificationPending = ref(false)
 
 const API_BASE_URL = import.meta.env.MODE === 'development'
     ? 'http://localhost:3000'
@@ -40,24 +51,30 @@ const API_BASE_URL = import.meta.env.MODE === 'development'
 
 onMounted(async () => {
     const token = route.query.token;
-    email.value = route.query.email;
+    email.value = route.query.email || localStorage.getItem('pending-verification-email');
 
-    if (!token || !email.value) {
+    if (token && email.value) {
+        try {
+            await axios.post(`${API_BASE_URL}/api/verify-email`, null, {
+                params: { token, email: email.value }
+            });
+            verified.value = true;
+        } catch (error) {
+            errorMessage.value = error.response?.data?.error || 'Verification failed. Please try again.';
+        } finally {
+            loading.value = false;
+        }
+    } else if (email.value) {
+        // Registration flow – just show confirmation message
         loading.value = false;
-        errorMessage.value = 'Invalid verification link. Please check your email for the correct link.';
-        return;
+        verificationPending.value = true;
+    } else {
+        // No email at all – error
+        loading.value = false;
+        errorMessage.value = 'Invalid access. Please register again.';
     }
 
-    try {
-        await axios.post(`${API_BASE_URL}/api/verify-email`, null, {
-            params: { token, email: email.value }
-        });
-        verified.value = true;
-    } catch (error) {
-        errorMessage.value = error.response?.data?.error || 'Verification failed. Please try again.';
-    } finally {
-        loading.value = false;
-    }
+
 });
 
 const resendVerification = async () => {

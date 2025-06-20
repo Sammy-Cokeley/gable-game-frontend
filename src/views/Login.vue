@@ -1,4 +1,5 @@
 <template>
+    <Header />
     <div class="auth-container">
         <div class="auth-box">
             <h2 class="auth-title">Welcome Back</h2>
@@ -41,8 +42,9 @@
 </template>
 
 <script setup>
+import Header from '@/components/Header.vue';
 import { ref } from 'vue';
-import { useAuthStore } from '@/services/auth.store.js';
+import { useAuthStore } from '@/store/auth.store.js';
 import axios from 'axios';
 
 const email = ref('');

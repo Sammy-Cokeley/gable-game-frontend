@@ -18,7 +18,7 @@
 
 <script setup>
 import { onMounted, ref, computed, nextTick } from 'vue'
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore } from '@/store/game.store'
 
 const gameStore = useGameStore()
 const searchQuery = ref('')
@@ -118,6 +118,18 @@ const hideDropdown = () => {
 
 .dropdown li.highlighted {
   background: lightgray;
+}
+
+.guess-input {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.guess-input input {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
 }
 
 @media (max-width: 768px) {

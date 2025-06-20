@@ -1,10 +1,14 @@
 <template>
+    <Header />
     <div class="auth-container">
         <div class="auth-box">
             <h2 class="auth-title">Create Account</h2>
 
             <div v-if="authStore.error" class="error-message">
                 {{ authStore.error }}
+            </div>
+            <div v-if="passwordMismatch" class="error-message">
+                Passwords do not match
             </div>
 
             <form @submit.prevent="handleRegister" class="auth-form">
@@ -18,6 +22,12 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" v-model="password" required placeholder="Create a password"
                         class="form-input" />
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="password" v-model="confirmPassword" required
+                        placeholder="Confirm password" class="form-input" />
                 </div>
 
                 <button type="submit" :disabled="authStore.loading" class="submit-button">
@@ -34,14 +44,23 @@
 </template>
 
 <script setup>
+import Header from '@/components/Header.vue';
 import { ref } from 'vue';
-import { useAuthStore } from '@/services/auth.store';
+import { useAuthStore } from '@/store/auth.store';
 
 const email = ref('');
 const password = ref('');
+const confirmPassword = ref('');
+const passwordMismatch = ref(false);
 const authStore = useAuthStore();
 
 const handleRegister = async () => {
+    passwordMismatch.value = password.value !== confirmPassword.value;
+
+    if (passwordMismatch.value) {
+        return
+    }
+
     try {
         await authStore.register(email.value, password.value);
     } catch (error) {

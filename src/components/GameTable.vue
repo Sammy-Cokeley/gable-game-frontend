@@ -24,6 +24,7 @@
         </thead>
         <tbody v-if="gameStore.previousGuesses.length">
           <tr v-for="guess in gameStore.previousGuesses" :key="guess.name">
+            <!-- <td> {{ guess }} </td> -->
             <td :style="{ backgroundColor: guess.feedback.name }" class="name-box">
               <span class="name"> {{ guess.name }}</span>
             </td>
@@ -65,9 +66,11 @@
 </template>
 
 <script setup>
-import { useGameStore } from '@/store/gameStore'
+import { useGameStore } from '@/store/game.store'
 import { MoveUp, MoveDown } from 'lucide-vue-next'
 const gameStore = useGameStore()
+
+
 </script>
 
 <style scoped>
