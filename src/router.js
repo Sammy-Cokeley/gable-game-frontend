@@ -20,6 +20,14 @@ const routes = [
     path: '/verify-email',
     component: () => import('./views/VerifyEmail.vue')
   },
+  {
+    path: '/privacy-policy',
+    component: () => import('./views/PrivacyPolicy.vue')
+  },
+  {
+    path: '/about',
+    component: () => import('./views/AboutPage.vue')
+  },
 ]
 
 const router = createRouter({

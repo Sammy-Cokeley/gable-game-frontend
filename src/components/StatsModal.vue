@@ -111,9 +111,6 @@ function getBarWidth(n) {
   const values = Object.values(winDistribution.value); // ✅ fix
   const max = Math.max(...values);
 
-  console.log(values)
-  console.log(max)
-
   const count = winDistribution.value[n] || 0;
 
   if (max === 0) return 0;

@@ -1,0 +1,191 @@
+body {
+  font-family: var(--q-font-family, 'JetBrains Mono', monospace);
+  line-height: 1.6;
+  color: var(--q-primary-text-color, #333);
+}
+
+/* Layout Containers */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: JetBrains Mono;
+
+  /* padding: 1rem;
+  width: 100%;*/
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.content-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.full-width-container {
+  width: 100%;
+  padding: 1.5rem;
+}
+
+.centered-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Typography */
+h1, .heading-xl {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+h2, .heading-lg {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+.text-body {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.text-caption {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Spacing Utilities */
+.mt-sm { margin-top: 0.5rem; }
+.mt-md { margin-top: 1rem; }
+.mt-lg { margin-top: 2rem; }
+
+.mb-sm { margin-bottom: 0.5rem; }
+.mb-md { margin-bottom: 1rem; }
+.mb-lg { margin-bottom: 2rem; }
+
+.px-md { padding-left: 1rem; padding-right: 1rem; }
+.py-md { padding-top: 1rem; padding-bottom: 1rem; }
+
+/* Color Utilities */
+.text-primary {
+  color: var(--q-primary);
+}
+
+.bg-light {
+  background-color: #f9f9f9;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #ddd;
+}
+
+/* Link Styling */
+a {
+  color: var(--q-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+a:hover {
+  text-decoration: underline;
+  color: var(--q-secondary);
+}
+
+/* Title Styling */
+.title {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.gable {
+  font-size: 2.25rem;
+  font-family: JetBrains Mono;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #021573;
+  margin: 0.5rem 0;
+}
+
+/* Guess Input Styling */
+.input {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.dropdown {
+  width: 100%;
+  max-width: 400px;
+  list-style: none;
+  padding: 0;
+  border: 1px solid #ccc;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  background: white;
+  z-index: 10;
+}
+
+.dropdown li {
+  padding: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.dropdown li.highlighted {
+  background: lightgray;
+}
+
+.guess-input {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.guess-input input {
+  padding: 0.6rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .input {
+    max-width: 90%;
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .dropdown {
+    max-width: 90%;
+  }
+
+  .dropdown li {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .input {
+    max-width: 100%;
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+
+  .dropdown {
+    max-width: 100%;
+  }
+
+  .dropdown li {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+}

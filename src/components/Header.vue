@@ -3,6 +3,7 @@
     <!-- Utility bar -->
     <div class="header-top">
       <div class="header-icons">
+        <router-link to="/" class="chip-button">Home</router-link>
         <button class="chip-button" @click="helpModal?.openModal()">Help</button>
         <button class="chip-button" @click="statsModal?.openModal()">Stats</button>
         <template v-if="isAuthenticated">
@@ -13,11 +14,6 @@
           <router-link to="/register" class="chip-button">Register</router-link>
         </template>
       </div>
-    </div>
-
-    <!-- Title -->
-    <div class="title">
-      <h1 class="gable">Gable Game</h1>
     </div>
   </div>
 
@@ -98,14 +94,7 @@ a {
   margin-top: 0.5rem;
 }
 
-.gable {
-  font-size: 2.25rem;
-  font-family: JetBrains Mono;
-  font-weight: 800;
-  letter-spacing: 6px;
-  color: #021573;
-  margin: 0.5rem 0;
-}
+
 
 /* Responsive tweaks */
 @media (max-width: 600px) {

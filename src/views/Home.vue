@@ -1,6 +1,11 @@
 <template>
-  <div class="container">
-    <Header />
+  <Header />
+
+  <!-- Title -->
+  <div class="title">
+    <h1 class="gable">Gable Game</h1>
+  </div>
+  <div class="home-container">
     <GuessInput />
     <GameTable />
   </div>
@@ -41,17 +46,4 @@ watch(
 )
 </script>
 
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: JetBrains Mono;
-
-  /* padding: 1rem;
-  width: 100%;*/
-  max-width: 900px;
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-</style>
+<style src="../css/global-styles.css"></style>
