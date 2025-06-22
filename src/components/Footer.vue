@@ -4,6 +4,7 @@
         <div>
             <router-link to="/about" class="footer-link q-mx-sm">About</router-link>
             <router-link to="/privacy-policy" class="footer-link q-mx-sm">Privacy Policy</router-link>
+            <router-link to="/contact" class="footer-link q-mx-sm">Contact</router-link>
         </div>
         <p class="copyright">© {{ new Date().getFullYear() }} Gable Game</p>
     </footer>

@@ -28,6 +28,10 @@ const routes = [
     path: '/about',
     component: () => import('./views/AboutPage.vue')
   },
+  {
+    path: '/contact',
+    component: () => import('./views/ContactPage.vue')
+  },
 ]
 
 const router = createRouter({

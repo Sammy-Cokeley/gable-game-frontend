@@ -53,7 +53,7 @@
           </div>
           <div class="stats-numbers">
             <div class="guess-distribution">
-              <h3>Guess Distribution</h3>
+              <h5>Guess Distribution</h5>
 
               <div v-for="n in 8" :key="n" class="guess-row">
                 <span class="guess-label">{{ n }}</span>
@@ -302,5 +302,10 @@ button.close-btn {
 
 .share-btn:hover {
   background-color: #0d8ddb;
+}
+
+h2,
+h5 {
+  margin: .5rem;
 }
 </style>
