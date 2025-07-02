@@ -66,8 +66,7 @@ export const useGameStore = defineStore('game', {
       if (!authStore.isAuthenticated) return;
 
       try {
-        const today = new Date().toISOString().split('T')[0];
-        const response = await axios.get(`${API_BASE_URL}/api/user/guesses?date=${today}`, {
+        const response = await axios.get(`${API_BASE_URL}/api/user/guesses`, {
           headers: {
             Authorization: `Bearer ${authStore.token}`
           }
