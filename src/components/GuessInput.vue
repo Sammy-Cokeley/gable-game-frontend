@@ -18,9 +18,9 @@
 
 <script setup>
 import { onMounted, ref, computed, nextTick } from 'vue'
-import { useGameStore } from '@/store/game.store'
+import { useDailyGameStore } from '@/store/dailyGame.store'
 
-const gameStore = useGameStore()
+const gameStore = useDailyGameStore()
 const searchQuery = ref('')
 const highlightedIndex = ref(0)
 const showDropdown = ref(false)

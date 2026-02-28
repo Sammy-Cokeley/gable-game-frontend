@@ -17,11 +17,11 @@ import Header from '@/components/Header.vue'
 import GuessInput from '@/components/GuessInput.vue'
 import GameTable from '@/components/GameTable.vue'
 import StatsModal from '@/components/StatsModal.vue';
-import { useGameStore } from '@/store/game.store';
+import { useDailyGameStore } from '@/store/dailyGame.store';
 import { onMounted, ref, watch } from 'vue';
 import { useAuthStore } from '@/store/auth.store';
 
-const gameStore = useGameStore()
+const gameStore = useDailyGameStore()
 const statsModal = ref(null)
 const authStore = useAuthStore();
 

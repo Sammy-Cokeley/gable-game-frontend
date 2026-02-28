@@ -32,6 +32,23 @@ const routes = [
     path: '/contact',
     component: () => import('./views/ContactPage.vue')
   },
+  {
+    path: '/match',
+    component: () => import('./views/MatchPage.vue')
+  },
+  {
+    path: '/admin',
+    component: () => import('./components/layouts/AdminLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      { path: 'rankings', component: () => import('./views/admin/rankings/AdminRankingsReleases.vue') },
+      { path: 'rankings/new', component: () => import('./views/admin/rankings/AdminRankingsCreateRelease.vue') },
+      { path: 'rankings/:releaseId', component: () => import('./views/admin/rankings/AdminRankingsReleaseDetail.vue'), props: true },
+      { path: 'rankings/:releaseId/resolve', component: () => import('./views/admin/rankings/AdminRankingsResolve.vue'), props: true },
+    ]
+  },
+
+
 ]
 
 const router = createRouter({
@@ -50,7 +67,12 @@ router.beforeEach((to, from, next) => {
     return next('/');
   }
 
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    return next('/')
+  }
+
   next();
 });
+
 
 export default router;

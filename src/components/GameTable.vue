@@ -66,9 +66,9 @@
 </template>
 
 <script setup>
-import { useGameStore } from '@/store/game.store'
+import { useDailyGameStore } from '@/store/dailyGame.store'
 import { MoveUp, MoveDown } from 'lucide-vue-next'
-const gameStore = useGameStore()
+const gameStore = useDailyGameStore()
 
 
 </script>

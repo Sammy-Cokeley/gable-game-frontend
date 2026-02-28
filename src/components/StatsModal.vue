@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import { useGameStore } from '@/store/game.store'
+import { useDailyGameStore } from '@/store/dailyGame.store'
 import { ref, watchEffect, computed } from 'vue'
 import { useAuthStore } from '@/store/auth.store'
 
@@ -83,7 +83,7 @@ let totalGames = 0
 let winRate = 0
 let roundedWinRate = 0
 
-const gameStore = useGameStore()
+const gameStore = useDailyGameStore()
 const isOpen = ref(false)
 const closeModal = () => (isOpen.value = false)
 const openModal = () => (isOpen.value = true)

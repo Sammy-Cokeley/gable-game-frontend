@@ -1,7 +1,5 @@
-import axios from 'axios';
-
-export default function setupInterceptors() {
-  axios.interceptors.request.use(
+export default function setupInterceptors(axiosInstance) {
+  axiosInstance.interceptors.request.use(
     (config) => {
       const user = JSON.parse(localStorage.getItem('user'));
       if (user && user.token) {
@@ -9,19 +7,15 @@ export default function setupInterceptors() {
       }
       return config;
     },
-    (error) => {
-      return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
   );
-  
-  axios.interceptors.response.use(
-    (res) => {
-      return res;
-    },
+
+  axiosInstance.interceptors.response.use(
+    (res) => res,
     (err) => {
-      if (err.response.status === 401) {
+      if (err?.response?.status === 401) {
         localStorage.removeItem('user');
-        location.href = '/login';
+        window.location.href = '/login';
       }
       return Promise.reject(err);
     }

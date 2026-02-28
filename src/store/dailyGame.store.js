@@ -7,7 +7,7 @@ const API_BASE_URL = import.meta.env.MODE === 'development'
   : 'https://gable-game-backend.onrender.com'
 const today = new Date().toISOString().split('T')[0];
 
-export const useGameStore = defineStore('game', {
+export const useDailyGameStore = defineStore('game', {
   state: () => ({
     dailyWrestler: null,
     allWrestlers: [],
