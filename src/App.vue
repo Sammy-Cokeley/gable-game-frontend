@@ -8,18 +8,21 @@
 </template>
 
 <script setup>
-import FooterLinks from './components/Footer.vue';
+import { useTheme } from '@/composables/useTheme'
+import FooterLinks from './components/Footer.vue'
+
+// Initialize theme from localStorage on app mount
+useTheme()
 </script>
 
 <style>
-/* Make the whole app a vertical flex layout */
 .app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: var(--bg);
 }
 
-/* Make the main content area expand to fill remaining space */
 .main-content {
   flex: 1;
 }

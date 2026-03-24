@@ -3,10 +3,6 @@ import authService from '../services/auth.service'
 import api from '../services/api'
 import router from '../router'
 
-const ADMIN_EMAILS = new Set([
-  'sammy.cokeley@gmail.com'
-])
-
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: authService.getCurrentUser(),
@@ -17,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isAuthenticated: (state) => !!state.user?.token,
     token: (state) => state.user?.token || null,
-    isAdmin: (state) => !!state.user?.email && ADMIN_EMAILS.has(state.user.email)
+    isAdmin: (state) => state.user?.is_admin === true
   },
 
   actions: {
@@ -64,7 +60,7 @@ export const useAuthStore = defineStore('auth', {
       if (!this.isAuthenticated) return
       this.loading = true
       try {
-        const { data } = await api.get('/api/me')
+        const { data } = await api.get('/api/gable/me')
 
         this.user = { ...this.user, ...data }
         localStorage.setItem('user', JSON.stringify(this.user))

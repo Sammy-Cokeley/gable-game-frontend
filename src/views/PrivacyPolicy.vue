@@ -1,37 +1,25 @@
 <template>
-    <Header />
-    <q-layout view="lHh Lpr lFf">
-        <q-page-container>
-            <q-page class="q-pa-md">
-                <div class="content-container q-mx-auto" style="max-width: 800px;">
-                    <h1 class="text-h4 q-mb-md">Privacy Policy</h1>
-                    <p class="text-body1 q-mb-md">
-                        Gable Game does not collect personal information from guest users. Game progress is saved
-                        locally in
-                        your browser using localStorage.
-                    </p>
-
-                    <p class="text-body1 q-mb-md">
-                        If you create an account, your guesses may be stored securely in our database to allow syncing
-                        across
-                        devices.
-                    </p>
-
-                    <p class="text-body1 q-mb-md">
-                        We do not use third-party trackers or share your data. This policy will be updated if we add
-                        analytics
-                        or advertising.
-                    </p>
-
-                    <p class="text-caption text-grey-7">Last updated: June 21, 2025</p>
-                </div>
-            </q-page>
-        </q-page-container>
-    </q-layout>
+  <Header />
+  <div class="prose-page">
+    <h1>Privacy Policy</h1>
+    <p>
+      Gable Game does not collect personal information from guest users. Game progress is saved
+      locally in your browser using localStorage.
+    </p>
+    <p>
+      If you create an account, your guesses may be stored securely in our database to allow syncing
+      across devices.
+    </p>
+    <p>
+      We do not use third-party trackers or share your data. This policy will be updated if we add
+      analytics or advertising.
+    </p>
+    <p class="caption">Last updated: June 21, 2025</p>
+  </div>
 </template>
 
 <script setup>
-import Header from '@/components/Header.vue';
+import Header from '@/components/Header.vue'
 </script>
 
 <style src="../css/global-styles.css"></style>

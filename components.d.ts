@@ -37,6 +37,7 @@ declare module 'vue' {
     QSelect: typeof import('quasar')['QSelect']
     QSeparator: typeof import('quasar')['QSeparator']
     QSpace: typeof import('quasar')['QSpace']
+    QSpinner: typeof import('quasar')['QSpinner']
     QTable: typeof import('quasar')['QTable']
     QTd: typeof import('quasar')['QTd']
     QToolbar: typeof import('quasar')['QToolbar']

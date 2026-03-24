@@ -1,218 +1,234 @@
 <template>
-    <Header />
-    <div class="auth-container">
-        <div class="auth-box">
-            <h2 class="auth-title">Welcome Back</h2>
+  <Header />
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2 class="auth-title">Welcome Back</h2>
 
-            <div v-if="authStore.error" class="error-message">
-                {{ authStore.error }}
-            </div>
+      <div v-if="authStore.error" class="error-message" role="alert">
+        {{ authStore.error }}
+      </div>
 
-            <form @submit.prevent="handleLogin" class="auth-form">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" v-model="email" required placeholder="Enter your email"
-                        class="form-input" />
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" v-model="password" required placeholder="Enter your password"
-                        class="form-input" />
-                </div>
-
-                <button type="submit" :disabled="authStore.loading" class="submit-button">
-                    {{ authStore.loading ? 'Logging in...' : 'Log In' }}
-                </button>
-            </form>
-
-            <div class="auth-footer">
-                Don't have an account?
-                <router-link to="/register" class="auth-link">Register</router-link>
-            </div>
-
-            <div v-if="needsVerification" class="verification-notice">
-                <p>Your email is not verified. Please check your inbox for the verification link.</p>
-                <button @click="resendVerification" class="resend-button">
-                    Resend Verification Email
-                </button>
-            </div>
+      <form @submit.prevent="handleLogin" class="auth-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" v-model="email" required placeholder="Enter your email" class="form-input" />
         </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" v-model="password" required placeholder="Enter your password" class="form-input" />
+        </div>
+
+        <button type="submit" :disabled="authStore.loading" class="submit-btn">
+          {{ authStore.loading ? 'Logging in…' : 'Log In' }}
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account?
+        <router-link to="/register" class="auth-link">Register</router-link>
+      </div>
+
+      <div v-if="needsVerification" class="verification-notice">
+        <p>Your email is not verified. Please check your inbox for the verification link.</p>
+        <button @click="resendVerification" class="resend-btn">
+          Resend Verification Email
+        </button>
+      </div>
     </div>
+  </div>
 </template>
 
 <script setup>
-import Header from '@/components/Header.vue';
-import { ref } from 'vue';
-import { useAuthStore } from '@/store/auth.store.js';
-import axios from 'axios';
+import Header from '@/components/Header.vue'
+import { ref } from 'vue'
+import { useAuthStore } from '@/store/auth.store.js'
+import axios from 'axios'
 
-const email = ref('');
-const password = ref('');
-const authStore = useAuthStore();
-const needsVerification = ref(false);
+const API_BASE_URL = import.meta.env.MODE === 'development'
+  ? 'http://localhost:3000'
+  : 'https://gable-game-backend.onrender.com'
+
+const email = ref('')
+const password = ref('')
+const authStore = useAuthStore()
+const needsVerification = ref(false)
 
 const handleLogin = async () => {
-    try {
-        await authStore.login(email.value, password.value);
-    } catch (error) {
-        console.error('Login failed', error);
-        // Check if verification is required
-        if (error.response?.data?.requiresVerification) {
-            needsVerification.value = true;
-        }
+  try {
+    await authStore.login(email.value, password.value)
+  } catch (error) {
+    console.error('Login failed', error)
+    if (error.response?.data?.requiresVerification) {
+      needsVerification.value = true
     }
-};
+  }
+}
 
 const resendVerification = async () => {
-    try {
-        await axios.post(`http://localhost:YOUR_PORT/resend-verification`, {
-            email: email.value
-        });
-        alert('Verification email has been sent. Please check your inbox.');
-    } catch (error) {
-        alert(error.response?.data?.error || 'Failed to resend verification email.');
-    }
-};
+  try {
+    await axios.post(`${API_BASE_URL}/api/gable/resend-verification`, { email: email.value })
+    alert('Verification email has been sent. Please check your inbox.')
+  } catch (error) {
+    alert(error.response?.data?.error || 'Failed to resend verification email.')
+  }
+}
 </script>
 
 <style scoped>
 .auth-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    padding: 20px;
+  min-height: calc(100vh - 60px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 2rem 1rem;
 }
 
-.auth-box {
-    background: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .auth-title {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
-    font-size: 28px;
-    font-weight: 600;
+  text-align: center;
+  color: var(--text-primary);
+  margin: 0 0 1.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .auth-form {
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-bottom: 1.25rem;
 }
 
 .form-group {
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #555;
-    font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .form-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    background-color: #f8f9fa;
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--surface-alt);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
 }
 
 .form-input:focus {
-    outline: none;
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-    background-color: white;
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.2);
+  background: var(--surface);
 }
 
-.submit-button {
-    width: 100%;
-    padding: 14px;
-    background: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+.submit-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--primary);
+  color: var(--primary-text);
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Inter', system-ui, sans-serif;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  margin-top: 0.25rem;
 }
 
-.submit-button:hover:not(:disabled) {
-    background: #357abd;
-    transform: translateY(-1px);
+.submit-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
 }
 
-.submit-button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .error-message {
-    color: #e74c3c;
-    text-align: center;
-    margin-bottom: 15px;
-    padding: 10px;
-    background: #fee;
-    border-radius: 6px;
-    font-size: 14px;
+  color: var(--error);
+  font-size: 0.875rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 0.65rem 0.9rem;
+  background: color-mix(in srgb, var(--error) 10%, var(--surface));
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
 }
 
 .auth-footer {
-    text-align: center;
-    color: #666;
-    font-size: 14px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .auth-link {
-    color: #4a90e2;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s;
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+  margin-left: 0.25rem;
 }
 
 .auth-link:hover {
-    color: #357abd;
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 .verification-notice {
-    margin-top: 20px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--surface-alt);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text-primary);
 }
 
 .verification-notice p {
-    margin-bottom: 10px;
-    color: #666;
-    font-size: 14px;
+  margin-bottom: 0.75rem;
 }
 
-.resend-button {
-    background: none;
-    border: 1px solid #4a90e2;
-    color: #4a90e2;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.3s;
+.resend-btn {
+  background: none;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  padding: 0.45rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.resend-button:hover {
-    background: #4a90e2;
-    color: white;
+.resend-btn:hover {
+  background: var(--primary);
+  color: var(--primary-text);
 }
 </style>

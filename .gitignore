@@ -28,3 +28,9 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Claude Code internal files
+.claude/
+
+# Generated design system docs
+design-system/

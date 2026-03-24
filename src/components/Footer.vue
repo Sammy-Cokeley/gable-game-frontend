@@ -1,39 +1,60 @@
 <template>
-    <footer class="footer-links q-mt-xl q-pa-md text-caption text-center">
-        <q-separator spaced />
-        <div>
-            <router-link to="/about" class="footer-link q-mx-sm">About</router-link>
-            <router-link to="/privacy-policy" class="footer-link q-mx-sm">Privacy Policy</router-link>
-            <router-link to="/contact" class="footer-link q-mx-sm">Contact</router-link>
-        </div>
-        <p class="copyright">© {{ new Date().getFullYear() }} Gable Game</p>
-    </footer>
+  <footer class="footer">
+    <div class="footer-inner">
+      <nav class="footer-links">
+        <router-link to="/about" class="footer-link">About</router-link>
+        <router-link to="/privacy-policy" class="footer-link">Privacy Policy</router-link>
+        <router-link to="/contact" class="footer-link">Contact</router-link>
+      </nav>
+      <p class="copyright">© {{ new Date().getFullYear() }} Gable Game</p>
+    </div>
+  </footer>
 </template>
 
 <script setup>
 </script>
 
 <style scoped>
+.footer {
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 1rem 1.5rem;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.footer-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .footer-links {
-    padding-top: .5rem;
-    padding-bottom: .5rem;
-    color: #888;
-    font-size: 0.9rem;
-    background-color: #f4f4f4;
-    /* Light background if needed */
+  display: flex;
+  gap: 1.25rem;
 }
 
 .footer-link {
-    margin: .5rem;
-    color: var(--q-primary);
-    text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: color 0.15s ease;
 }
 
 .footer-link:hover {
-    text-decoration: underline;
+  color: var(--primary);
+  text-decoration: none;
 }
 
 .copyright {
-    padding-left: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 </style>

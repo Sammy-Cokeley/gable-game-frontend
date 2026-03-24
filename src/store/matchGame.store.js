@@ -5,6 +5,7 @@ import { useAuthStore } from './auth.store';
 const API_BASE_URL = import.meta.env.MODE === 'development'
   ? 'http://localhost:3000'
   : 'https://gable-game-backend.onrender.com'
+const GAME_API = `${API_BASE_URL}/api/gable`
 
 export const useMatchGameStore = defineStore('game', {
   state: () => ({
@@ -19,7 +20,7 @@ export const useMatchGameStore = defineStore('game', {
     async getMatch() {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/api/match`,
+          `${GAME_API}/match`,
         )
         this.match = response.data.match;
         this.wrestlerA = response.data.wrestlerA;
@@ -30,8 +31,8 @@ export const useMatchGameStore = defineStore('game', {
         this.revealedHints[2] = this.match.weight;
         this.revealedHints[3] = this.wrestlerA.conference;
         this.revealedHints[4] = this.wrestlerB.conference;
-        this.revealedHints[5] = this.wrestlerA.win_percentage + " " + this.wrestlerA.ncaa_finish;
-        this.revealedHints[6] = this.wrestlerB.win_percentage + " " + this.wrestlerB.ncaa_finish;
+        this.revealedHints[5] = parseFloat(this.wrestlerA.win_percentage).toFixed(1) + "% " + this.wrestlerA.ncaa_finish;
+        this.revealedHints[6] = parseFloat(this.wrestlerB.win_percentage).toFixed(1) + "% " + this.wrestlerB.ncaa_finish;
         console.log(this.revealedHints)
       } catch (error) {
         console.error('Wrestler not found:', error)
