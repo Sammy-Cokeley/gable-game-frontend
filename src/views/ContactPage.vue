@@ -15,10 +15,11 @@
 
       <div class="form-group">
         <label for="message">Message</label>
-        <textarea id="message" v-model="message" required placeholder="Write your message here…" class="form-input" rows="5"></textarea>
+        <textarea id="message" v-model="message" required placeholder="Write your message here…" class="form-input" rows="5" minlength="15"></textarea>
+        <span v-if="message.length > 0 && message.trim().length < 15" class="field-hint">Message must be at least 15 characters.</span>
       </div>
 
-      <button type="submit" :disabled="loading" class="submit-btn">
+      <button type="submit" :disabled="loading || message.trim().length < 15" class="submit-btn">
         {{ loading ? 'Sending…' : 'Send Message' }}
       </button>
     </form>
@@ -64,8 +65,8 @@ const submitForm = async () => {
     successMessage.value = 'Message sent successfully!'
     name.value = ''
     message.value = ''
-  } catch {
-    errorMessage.value = 'Something went wrong. Please try again later.'
+  } catch (err) {
+    errorMessage.value = err?.response?.data?.error || 'Something went wrong. Please try again later.'
   } finally {
     loading.value = false
   }
@@ -86,6 +87,12 @@ const submitForm = async () => {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--error);
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .form-group label {
